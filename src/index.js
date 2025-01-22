@@ -34,7 +34,9 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
-    res.render("signup")
+    const error = req.session.error;
+    req.session.error = null; // Clear the error after displaying it
+    res.render('signup', { error });
 });
 
 
@@ -48,7 +50,8 @@ app.post("/signup", async (req,res) => {
     //check if username is taken
     const existingUser = await collection.findOne({name: data.name});
     if(existingUser) {
-        res.send("Username is taken, please enter different username.");
+        req.session.error = 'Username is taken, please enter different username.';
+        res.redirect('/signup'); // Reload login page
     } else {
         //hash password
         const saltRounds = 10;
@@ -66,7 +69,8 @@ app.post("/login", async(req, res) => {
         const enteredName = req.body.username;
         const nameCheck = await collection.findOne({name: enteredName});
         if(!nameCheck) {
-            res.send("username does not exist.");
+            req.session.error = 'Invalid username or password';
+            return res.redirect('/login'); // Reload login page
         }
 
         const passwordMatch = await bcrypt.compare(req.body.password, nameCheck.password);
@@ -84,7 +88,6 @@ app.post("/login", async(req, res) => {
     }
 });
 
-
 app.get('/dashboard', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/login'); // Redirect if not logged in
@@ -96,7 +99,6 @@ app.get('/logout', (req, res) => {
     req.session.destroy(); // Destroy the session
     res.redirect('/login'); // Redirect to login
 });
-
 
 app.listen(port, ()=>{
     console.log(`server running on port: ${port}`);
