@@ -9,6 +9,9 @@
 <body>
     <div class="div" class="form-container">
         <h2>Sign Up</h2>
+        <% if (error) { %>
+            <p style="color: red;"><%= error %></p>
+        <% } %>
         <form action="/signup" method="post">
             <div class="form-group">
                 <label for="name">Name:</label>

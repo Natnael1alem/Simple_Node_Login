@@ -41,7 +41,7 @@ app.get('/signup', (req, res) => {
 
 
 //the functions
-app.post("/signup", async (req,res) => {
+app.post("/signup", async (req,res) => {it 
     const data = {
         name: req.body.username,
         password: req.body.password,
@@ -51,7 +51,7 @@ app.post("/signup", async (req,res) => {
     const existingUser = await collection.findOne({name: data.name});
     if(existingUser) {
         req.session.error = 'Username is taken, please enter different username.';
-        res.redirect('/signup'); // Reload login page
+        return res.redirect('/signup'); // Reload signup page
     } else {
         //hash password
         const saltRounds = 10;
@@ -60,7 +60,7 @@ app.post("/signup", async (req,res) => {
         const userdata = await collection.insertMany(data);
         console.log(userdata);
     }
-    res.render("login");
+    return res.redirect('/login');
 });
 
 
